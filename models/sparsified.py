@@ -287,4 +287,4 @@ class SparsifiedGPT(nn.Module):
             case SAEVariant.TOPK:
                 return TopKSAE
             case _:
-                raise ValueError(f"Unrecognized SAE variant: {self.sae_variant}")
+                raise ValueError(f"Unrecognized SAE variant: {config.sae_variant}")

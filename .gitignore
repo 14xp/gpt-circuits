@@ -1,6 +1,7 @@
 # Training output
 checkpoints/
 *.npy
+*.json
 
 # Node app
 app/build/
@@ -19,3 +20,9 @@ __pycache__/
 
 # Virtual environment
 .venv/
+
+# Figures
+*.png
+*.jpg
+*.jpeg
+*.svg

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from config import Config, map_options
-from data.tokenizers import ASCIITokenizer, TikTokenTokenizer, Tokenizer
+from data.tokenizers import ASCIITokenizer, TikTokenTokenizer, IntegerTokenizer, Tokenizer
 
 
 @dataclass
@@ -23,7 +23,8 @@ class GPTConfig(Config):
             case ASCIITokenizer.vocab_size:
                 return ASCIITokenizer()
             case _:
-                raise ValueError(f"Unrecognized vocab size: {self.vocab_size}")
+                # For any other vocab size, assume it's an integer tokenizer
+                return IntegerTokenizer(self.vocab_size)
 
     @staticmethod
     def dict_factory(fields: list) -> dict:
@@ -66,5 +67,37 @@ gpt_options: dict[str, GPTConfig] = map_options(
         n_layer=4,
         n_head=16,
         n_embd=256,
+    ),
+    GPTConfig(
+        name="integer_1000_128x4",
+        block_size=128,
+        vocab_size=1000,
+        n_layer=4,
+        n_head=8,
+        n_embd=128,
+    ),
+    GPTConfig(
+        name="integer_10000_256x6",
+        block_size=128,
+        vocab_size=10000,
+        n_layer=6,
+        n_head=16,
+        n_embd=256,
+    ),
+    GPTConfig(
+        name="integer_100_64x1",
+        block_size=32,
+        vocab_size=100,
+        n_layer=1,
+        n_head=4,
+        n_embd=64,
+    ),
+    GPTConfig(
+        name="mess3_64x1",
+        block_size=10,
+        vocab_size=4,
+        n_layer=1,
+        n_head=1,
+        n_embd=64,
     ),
 )
