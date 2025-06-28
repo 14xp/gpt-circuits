@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Script to perform PCA analysis on GPT model activations.
-Generates all possible length-10 sequences with BOS token 3, captures activations,
+Generates all possible length-N sequences with BOS token 3, captures activations,
 and performs PCA visualization.
 """
 
@@ -24,13 +24,14 @@ def generate_all_sequences() -> List[List[int]]:
     """
     Generate all possible length-10 sequences with BOS token 3.
     Format: [3, *, *, *, *, *, *, *, *, *] where * ∈ {0, 1, 2}
-    Returns 3^9 = 19,683 sequences.
+    Returns 3^block_size-1
     """
     print("Generating all possible sequences...")
     sequences = []
+    block_size = 12  # Total length including BOS token
     
     # Generate all combinations of 9 positions with values {0, 1, 2}
-    for combination in itertools.product([0, 1, 2], repeat=9):
+    for combination in itertools.product([0, 1, 2], repeat=block_size-1):
         sequence = [3] + list(combination)  # BOS token 3 + 9 other tokens
         sequences.append(sequence)
     
@@ -104,14 +105,16 @@ def process_activations(activations: torch.Tensor) -> np.ndarray:
     Input shape: (num_sequences, seq_len, n_embd)
     Output shape: (num_sequences * (seq_len-1), n_embd)
     """
+    block_size = 12
+
     # # Remove BOS token (position 0), keep positions 1-9
     # activations_no_bos = activations[:, 1:, :]  # Shape: (num_sequences, 9, n_embd)
 
-    # # Remove BOS token and final position (position 0 & final token), keep positions 1-8
-    # activations_no_bos = activations[:, 1:9, :]  # Shape: (num_sequences, 8, n_embd)
+    # Remove BOS token and final position (position 0 & final token), keep positions 1-8
+    activations_no_bos = activations[:, 1:block_size-1, :]  # Shape: (num_sequences, 8, n_embd)
 
-    # Keep only final position (position 9)
-    activations_no_bos = activations[:, 9:10, :]  # Shape: (num_sequences, 1, n_embd)
+    # # Keep only final position (position 9)
+    # activations_no_bos = activations[:, block_size-1:block_size, :]  # Shape: (num_sequences, 1, n_embd)
     
     # Flatten over sequence dimension
     num_sequences, seq_len_minus_1, n_embd = activations_no_bos.shape
@@ -162,7 +165,7 @@ def perform_pca_and_plot(intermediate_data: np.ndarray, final_data: np.ndarray, 
     plt.tight_layout()
     
     # Save the plot
-    output_path = 'play/pca_analysis_three_stages.png'
+    output_path = 'play/plots/pca_analysis_three_stages.png'
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     print(f"Plot saved to {output_path}")
     
@@ -194,8 +197,8 @@ def main():
     print(f"Using device: {device}")
     
     # Load model
-    print("Loading model from checkpoints/mess3_64x1...")
-    model_path = "checkpoints/mess3_64x1"
+    print("Loading model from checkpoints/mess3_12_2_64x1...")
+    model_path = "checkpoints/mess3_12_2_64x1"
     model = GPT.load(model_path, device)
     model.eval()
     print(f"Model loaded successfully!")

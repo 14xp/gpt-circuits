@@ -200,7 +200,7 @@ def visualize_classes(activations_pca: np.ndarray, labels: np.ndarray, threshold
     ax4.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig('play/sequence_classes.png', dpi=300, bbox_inches='tight')
+    plt.savefig('play/plots/sequence_classes.png', dpi=300, bbox_inches='tight')
     plt.show()
 
 
@@ -315,7 +315,7 @@ def main():
     # Create visualizations
     print("\nCreating visualizations...")
     visualize_classes(activations_pca, labels, threshold)
-    print("Visualization saved to play/sequence_classes.png")
+    print("Visualization saved to play/plots/sequence_classes.png")
     
     print("\n=== Analysis Complete ===")
 

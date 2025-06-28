@@ -100,4 +100,12 @@ gpt_options: dict[str, GPTConfig] = map_options(
         n_head=1,
         n_embd=64,
     ),
+    GPTConfig(
+        name="mess3_12_64x1",
+        block_size=12,
+        vocab_size=4,
+        n_layer=1,
+        n_head=1,
+        n_embd=64,
+    ),
 )
