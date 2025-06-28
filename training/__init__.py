@@ -181,9 +181,17 @@ class Trainer:
         # Let's see what we're starting with.
         self.val_step(0)
 
+        # Save initial checkpoint if configured
+        if self.config.checkpoint_interval and self.is_main_process:
+            self.save_step_checkpoint(self.unwrapped_model, 0)
+
         # Start training.
         for step in range(1, self.config.max_steps + 1):
             self.train_step(step)
+
+            # Save checkpoint every N steps if configured
+            if self.config.checkpoint_interval and step % self.config.checkpoint_interval == 0 and self.is_main_process:
+                self.save_step_checkpoint(self.unwrapped_model, step)
 
             # Always evaluate the model at the end of training.
             last_step = step == self.config.max_steps
@@ -314,6 +322,18 @@ class Trainer:
         :param is_best: A tensor comparing the current loss to the best loss.
         """
         model.save(self.config.out_dir)
+
+    def save_step_checkpoint(self, model, step: int):
+        """
+        Save model weights for a specific step.
+
+        :param model: The model to save.
+        :param step: The training step number.
+        """
+        from pathlib import Path
+        step_dir = Path(self.config.out_dir) / f"step_{step}"
+        os.makedirs(step_dir, exist_ok=True)
+        model.save(step_dir)
 
     def log(self, data: dict, destination: LogDestination):
         """
